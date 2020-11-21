@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
-	"go-sdk/hsc"
+	"github.com/hschain/go-sdk/hsc"
 )
 
 func main() {
