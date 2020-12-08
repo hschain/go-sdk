@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/hschain/hschain/codec"
 )
@@ -109,8 +108,8 @@ func (w *Wallet) SignAndBroadcast(tx TransactionPayload, lcdEndpoint string, txM
 	signedTx, err := w.Sign(
 		tx,
 		nodeInfo.Info.Network,
-		strconv.FormatInt(accountData.Result.Value.AccountNumber, 10),
-		strconv.FormatInt(accountData.Result.Value.Sequence, 10),
+		accountData.Result.Value.AccountNumber,
+		accountData.Result.Value.Sequence,
 	)
 	if err != nil {
 		return "", fmt.Errorf("could not sign transaction: %w", err)
