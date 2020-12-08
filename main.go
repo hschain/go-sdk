@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/hschain/go-sdk/hsc"
@@ -15,7 +16,7 @@ func main() {
 		}
 	*/
 
-	mnemonic := "hurt embark exclude harvest silly oval jar metal obscure they renew junk often artwork link situate fat town uncover bamboo monster federal pink debris"
+	mnemonic := "drink lunch camera exhibit green spirit fiber mammal maze unable toilet hobby broken crop program physical village increase vapor jungle skirt section seed way"
 	log.Printf("mnemonic is %s", mnemonic)
 
 	wallet, err := hsc.FromMnemonic("hsc", mnemonic, "m/44'/532'/0'/0/0")
@@ -26,7 +27,7 @@ func main() {
 
 	tx := hsc.TransactionPayload{
 		Message: []json.RawMessage{
-			json.RawMessage([]byte(`{"type":"cosmos-sdk/MsgSend","value":{"from_address":"hsc1tqkux4ck3uawakl452sy7rzjq7x3ersurlzp6z","to_address":"hsc13q8fvtemy0tt0skhj4td9haqjkad6ffhz28qdg","amount":[{"denom":"uhst","amount":"10"}]}}`)),
+			json.RawMessage([]byte(fmt.Sprintf(`{"type":"cosmos-sdk/MsgSend","value":{"from_address":"%s","to_address":"%s","amount":[{"denom":"%s","amount":"10000000"}]}}`, wallet.Address, "hsc12503y3tnra7wlw2rg5htna3s0wdrtvfuws3mjm", "uhst"))),
 		},
 		Fee: hsc.Fee{
 			Amount: []hsc.Coin{},
@@ -45,6 +46,5 @@ func main() {
 	if err != nil {
 		log.Panicf("broadcast faied %s", err)
 	}
-
 	log.Printf("out is %s", out)
 }

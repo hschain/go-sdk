@@ -3,6 +3,7 @@ package hsc
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -15,31 +16,20 @@ func getAccountData(lcdEndpoint, address string) (AccountData, error) {
 	if err != nil {
 		return AccountData{}, err
 	}
-
-	jdec := json.NewDecoder(resp.Body)
-
-	if resp.StatusCode != http.StatusOK {
-		// we had an error, deserialize it and return
-		var jsonError Error
-		err := jdec.Decode(&jsonError)
-		if err != nil {
-			return AccountData{}, fmt.Errorf("error deserializing account data JSON error: %w", err)
-		}
-
-		return AccountData{}, fmt.Errorf("error during get account data: %s", jsonError.Error)
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return AccountData{}, fmt.Errorf("read body error: %w", err)
 	}
 
 	var accountData AccountData
-
-	errCdc := jdec.Decode(&accountData)
-	if errCdc != nil {
-		return AccountData{}, fmt.Errorf("could not unmarshal node response: %w", errCdc)
+	err = json.Unmarshal(data, &accountData)
+	if err != nil {
+		return AccountData{}, fmt.Errorf("could not unmarshal node response: %w", err)
 	}
 
 	if accountData.Result.Value.Address == "" {
 		return AccountData{}, fmt.Errorf("account with address %s is not online", address)
 	}
-
 	return accountData, nil
 }
 
