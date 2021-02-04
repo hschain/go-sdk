@@ -8,8 +8,8 @@ import (
 
 	"github.com/awnumar/memguard"
 	"github.com/btcsuite/btcutil/hdkeychain"
-	sdk "github.com/hschain/hschain/types"
 	"github.com/cosmos/go-bip39"
+	sdk "github.com/hschain/hschain/types"
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
@@ -21,17 +21,18 @@ import (
 type Wallet struct {
 	keyPair         *hdkeychain.ExtendedKey
 	publicKey       *hdkeychain.ExtendedKey
-	PublicKey       string `json:"public_key,omitempty"`
-	PublicKeyBech32 string `json:"public_key_bech_32,omitempty"`
-	PrivateKey      string `json:"private_key,omitempty"`
-	Path            string `json:"path,omitempty"`
-	HRP             string `json:"hrp,omitempty"`
-	Address         string `json:"address,omitempty"`
+	PublicKey       string    `json:"public_key,omitempty"`
+	PublicKeyBech32 string    `json:"public_key_bech_32,omitempty"`
+	PrivateKey      string    `json:"private_key,omitempty"`
+	Path            string    `json:"path,omitempty"`
+	HRP             string    `json:"hrp,omitempty"`
+	Address         string    `json:"address,omitempty"`
+	Transfer        *Transfer `json:"transfer,omitempty"`
 }
 
 // FromMnemonic returns a new Wallet instance given a human-readable part,
 // mnemonic and path.
-func FromMnemonic(hrp, mnemonic, path string) (*Wallet, error) {
+func FromMnemonic(hrp, mnemonic, path string, transfer *Transfer) (*Wallet, error) {
 	var w Wallet
 	k, a, err := deriveFromMnemonic(hrp, mnemonic, path)
 	if err != nil {
@@ -57,7 +58,7 @@ func FromMnemonic(hrp, mnemonic, path string) (*Wallet, error) {
 	}
 
 	w.PublicKeyBech32 = pkb32
-
+	w.Transfer = transfer
 	return &w, nil
 }
 
