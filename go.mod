@@ -7,6 +7,7 @@ require (
 	github.com/btcsuite/btcd v0.21.0-beta
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/cosmos/go-bip39 v0.0.0-20200817134856-d632e0d11689
+	github.com/go-resty/resty/v2 v2.4.0
 	github.com/hschain/hschain v0.6.3
 	github.com/jarcoal/httpmock v1.0.6
 	github.com/stretchr/testify v1.6.1
