@@ -21,18 +21,18 @@ import (
 type Wallet struct {
 	keyPair         *hdkeychain.ExtendedKey
 	publicKey       *hdkeychain.ExtendedKey
-	PublicKey       string    `json:"public_key,omitempty"`
-	PublicKeyBech32 string    `json:"public_key_bech_32,omitempty"`
-	PrivateKey      string    `json:"private_key,omitempty"`
-	Path            string    `json:"path,omitempty"`
-	HRP             string    `json:"hrp,omitempty"`
-	Address         string    `json:"address,omitempty"`
-	Transfer        *Transfer `json:"transfer,omitempty"`
+	PublicKey       string `json:"public_key,omitempty"`
+	PublicKeyBech32 string `json:"public_key_bech_32,omitempty"`
+	PrivateKey      string `json:"private_key,omitempty"`
+	Path            string `json:"path,omitempty"`
+	HRP             string `json:"hrp,omitempty"`
+	Address         string `json:"address,omitempty"`
+	Hsc             *Hsc   `json:"transfer,omitempty"`
 }
 
 // FromMnemonic returns a new Wallet instance given a human-readable part,
 // mnemonic and path.
-func FromMnemonic(hrp, mnemonic, path string, transfer *Transfer) (*Wallet, error) {
+func FromMnemonic(hrp, mnemonic, path string, Hsc *Hsc) (*Wallet, error) {
 	var w Wallet
 	k, a, err := deriveFromMnemonic(hrp, mnemonic, path)
 	if err != nil {
@@ -58,11 +58,11 @@ func FromMnemonic(hrp, mnemonic, path string, transfer *Transfer) (*Wallet, erro
 	}
 
 	w.PublicKeyBech32 = pkb32
-	w.Transfer = transfer
+	w.Hsc = Hsc
 	return &w, nil
 }
 
-func (w Wallet) bech32AminoPubKey() (string, error) {
+func (w *Wallet) bech32AminoPubKey() (string, error) {
 	pkec, _ := w.publicKey.ECPubKey()
 
 	var cdc = amino.NewCodec()
@@ -80,7 +80,7 @@ func (w Wallet) bech32AminoPubKey() (string, error) {
 
 // Export creates a JSON representation of w.
 // Export does not include the private key in the JSON representation.
-func (w Wallet) Export() (string, error) {
+func (w *Wallet) Export() (string, error) {
 	w.PrivateKey = ""
 	data, err := json.Marshal(w)
 
@@ -89,7 +89,7 @@ func (w Wallet) Export() (string, error) {
 
 // ExportWithPrivateKey creates a JSON representation of w.
 // ExportWithPrivateKey includes the private key in the JSON representation.
-func (w Wallet) ExportWithPrivateKey() (string, error) {
+func (w *Wallet) ExportWithPrivateKey() (string, error) {
 	w.PrivateKey = w.keyPair.String()
 
 	s := memguard.NewStream()
@@ -142,7 +142,7 @@ func signBytes(tx TransactionPayload, chainID, accountNumber, sequenceNumber str
 // Sign signs tx with given chainID, accountNumber and sequenceNumber, with w's private key.
 // The resulting computation must be enclosed in a Transaction struct to be sent over the wire
 // to a Cosmos LCD.
-func (w Wallet) Sign(tx TransactionPayload, chainID, accountNumber, sequenceNumber string) (SignedTransactionPayload, error) {
+func (w *Wallet) Sign(tx TransactionPayload, chainID, accountNumber, sequenceNumber string) (SignedTransactionPayload, error) {
 	signBytes := signBytes(tx, chainID, accountNumber, sequenceNumber)
 
 	pk, err := w.keyPair.ECPrivKey()

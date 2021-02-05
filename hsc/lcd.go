@@ -8,16 +8,16 @@ import (
 	"strconv"
 )
 
-func NewTransfer(lcdEndpoint string) *Transfer {
-	return &Transfer{
+func NewHsc(lcdEndpoint string) *Hsc {
+	return &Hsc{
 		LcdEndpoint: lcdEndpoint,
 	}
 }
 
 // Retrieve the account data related to the given wallet address, like
 // account number and sequence number.
-func (T Transfer) GetAccountData(address string) (AccountData, error) {
-	endpoint := fmt.Sprintf("%s/auth/accounts/%s", T.LcdEndpoint, address)
+func (h *Hsc) GetAccountData(address string) (AccountData, error) {
+	endpoint := fmt.Sprintf("%s/auth/accounts/%s", h.LcdEndpoint, address)
 
 	resp, err := http.Get(endpoint)
 	if err != nil {
@@ -42,8 +42,8 @@ func (T Transfer) GetAccountData(address string) (AccountData, error) {
 
 // Return useful information of the full node, like the Network
 // (chain) name.
-func (T Transfer) getNodeInfo() (NodeInfo, error) {
-	endpoint := fmt.Sprintf("%s/node_info", T.LcdEndpoint)
+func (h *Hsc) getNodeInfo() (NodeInfo, error) {
+	endpoint := fmt.Sprintf("%s/node_info", h.LcdEndpoint)
 	resp, err := http.Get(endpoint)
 	if err != nil {
 		return NodeInfo{}, err
@@ -59,8 +59,8 @@ func (T Transfer) getNodeInfo() (NodeInfo, error) {
 	return nodeInfo, nil
 }
 
-func (T Transfer) GetNewestBlockHeight() (int64, error) {
-	endpoint := fmt.Sprintf("%s/blocks/latest", T.LcdEndpoint)
+func (h *Hsc) GetNewestBlockHeight() (int64, error) {
+	endpoint := fmt.Sprintf("%s/blocks/latest", h.LcdEndpoint)
 	resp, err := http.Get(endpoint)
 	if err != nil {
 		return 0, err
@@ -76,8 +76,8 @@ func (T Transfer) GetNewestBlockHeight() (int64, error) {
 	return strconv.ParseInt(blockInfo.Block.Header.Height, 10, 64)
 }
 
-func (T Transfer) GetBlockHeightInfo(height int64) (BlockMeta, error) {
-	endpoint := fmt.Sprintf("%s/blocks/%d", T.LcdEndpoint, height)
+func (h *Hsc) GetBlockHeightInfo(height int64) (BlockMeta, error) {
+	endpoint := fmt.Sprintf("%s/blocks/%d", h.LcdEndpoint, height)
 	fmt.Println(endpoint)
 	resp, err := http.Get(endpoint)
 	if err != nil {
@@ -94,8 +94,8 @@ func (T Transfer) GetBlockHeightInfo(height int64) (BlockMeta, error) {
 	return blockInfo.BlockMeta, nil
 }
 
-func (T Transfer) GetBlockHeightTxInfo(height, limit, page int64) (TransferInfo, error) {
-	endpoint := fmt.Sprintf("%s/txs?tx.minheight=%d&tx.maxheight=%d&page=%d&limit=%d", T.LcdEndpoint, height, height, limit, page)
+func (h *Hsc) GetBlockHeightTxInfo(height, limit, page int64) (TransferInfo, error) {
+	endpoint := fmt.Sprintf("%s/txs?tx.minheight=%d&tx.maxheight=%d&page=%d&limit=%d", h.LcdEndpoint, height, height, limit, page)
 	fmt.Println(endpoint)
 	resp, err := http.Get(endpoint)
 	if err != nil {
@@ -113,8 +113,8 @@ func (T Transfer) GetBlockHeightTxInfo(height, limit, page int64) (TransferInfo,
 	return info, nil
 }
 
-func (T Transfer) GetTxHashTxInfo(hash string) (Txs, error) {
-	endpoint := fmt.Sprintf("%s/txs/%s", T.LcdEndpoint, hash)
+func (h *Hsc) GetTxHashTxInfo(hash string) (Txs, error) {
+	endpoint := fmt.Sprintf("%s/txs/%s", h.LcdEndpoint, hash)
 	fmt.Println(endpoint)
 	resp, err := http.Get(endpoint)
 	if err != nil {

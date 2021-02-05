@@ -93,13 +93,13 @@ func broadcastTx(tx SignedTransactionPayload, lcdEndpoint string, txMode TxMode)
 // SignAndBroadcast signs tx and broadcast it to the LCD specified by lcdEndpoint.
 func (w *Wallet) SignAndBroadcast(tx TransactionPayload, txMode TxMode) (string, error) {
 	// get network (chain) name
-	nodeInfo, err := w.Transfer.getNodeInfo()
+	nodeInfo, err := w.Hsc.getNodeInfo()
 	if err != nil {
 		return "", fmt.Errorf("could not get LCD node informations: %w", err)
 	}
 
 	// get account sequence and account number
-	accountData, err := w.Transfer.GetAccountData(w.Address)
+	accountData, err := w.Hsc.GetAccountData(w.Address)
 	if err != nil {
 		return "", fmt.Errorf("could not get Account informations for address %s: %w", w.Address, err)
 	}
@@ -116,7 +116,7 @@ func (w *Wallet) SignAndBroadcast(tx TransactionPayload, txMode TxMode) (string,
 	}
 
 	// broadcast transaction to the LCD
-	txHash, err := broadcastTx(signedTx, w.Transfer.LcdEndpoint, txMode)
+	txHash, err := broadcastTx(signedTx, w.Hsc.LcdEndpoint, txMode)
 	if err != nil {
 		return "", fmt.Errorf("could not broadcast transaction to the Cosmos network: %w", err)
 	}

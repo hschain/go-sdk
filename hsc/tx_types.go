@@ -69,6 +69,6 @@ type Txs struct {
 	Error     *string   `json:"error"`
 }
 
-type Transfer struct {
+type Hsc struct {
 	LcdEndpoint string `json:"lcd_endpoint"`
 }
