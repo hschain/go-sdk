@@ -8,10 +8,10 @@ import (
 )
 
 func main() {
-	transfer := hsc.NewTransfer("https://testnet.hschain.io/api/lcd")
+	hschain := hsc.NewHsc("https://testnet.hschain.io/api/lcd")
 
 	mnemonic := "drink lunch camera exhibit green spirit fiber mammal maze unable toilet hobby broken crop program physical village increase vapor jungle skirt section seed way"
-	wallet, err := hsc.FromMnemonic("hsc", mnemonic, "m/44'/532'/0'/0/0", transfer)
+	wallet, err := hsc.FromMnemonic("hsc", mnemonic, "m/44'/532'/0'/0/0", hschain)
 	if err != nil {
 		log.Panicf("create wallet faied %s", err)
 	}
@@ -22,7 +22,7 @@ func main() {
 
 	txHash, err := wallet.TransferDestory("hst", "", 1000)
 
-	tx, err := wallet.Transfer.GetTxHashTxInfo(txHash)
+	tx, err := wallet.Hsc.GetTxHashTxInfo(txHash)
 
 	if err != nil {
 		log.Printf("tx hash is error : ", err)
