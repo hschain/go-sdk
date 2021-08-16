@@ -183,3 +183,17 @@ func (w *Wallet) Sign(tx TransactionPayload, chainID, accountNumber, sequenceNum
 
 	return SignedTransactionPayload(tx), nil
 }
+
+func (w *Wallet) GetPrivateKey() (string, error) {
+	keyinfo, err := w.ExportWithPrivateKey()
+	if err != nil {
+		return keyinfo, err
+	}
+
+	var infos KeyInfo
+	err = json.Unmarshal([]byte(keyinfo), &infos)
+	if err != nil {
+		return keyinfo, err
+	}
+	return infos.PrivateKey, nil
+}

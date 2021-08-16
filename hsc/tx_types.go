@@ -72,3 +72,24 @@ type Txs struct {
 type Hsc struct {
 	LcdEndpoint string `json:"lcd_endpoint"`
 }
+
+type UserTransferInfo struct {
+	TotalCount string    `json:"total_count"`
+	Count      string    `json:"count"`
+	PageNumber string    `json:"page_number"`
+	PageTotal  string    `json:"page_total"`
+	Limit      string    `json:"limit"`
+	Txs        []UserTxs `json:"txs"`
+}
+
+type UserTxs struct {
+	Success     bool   `json:"success"`
+	Height      string `json:"height"`
+	Txhash      string `json:"txhash"`
+	FromAddress string `json:"from_address"`
+	ToAddress   string `json:"to_address"`
+	Denom       string `json:"denom"`
+	Amount      string `json:"amount"`
+	Memo        string `json:"memo"`
+	Log         string `json:"log"`
+}

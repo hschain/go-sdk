@@ -54,3 +54,16 @@ type SigPubKey struct {
 	Type  string `json:"type"`
 	Value string `json:"value"`
 }
+
+type KeyInfo struct {
+	PublicKey       string   `json:"public_key"`
+	PublicKeyBech32 string   `json:"public_key_bech_32"`
+	PrivateKey      string   `json:"private_key"`
+	Path            string   `json:"path"`
+	Hrp             string   `json:"hrp"`
+	Address         string   `json:"address"`
+	Transfer        Transfer `json:"transfer"`
+}
+type Transfer struct {
+	LcdEndpoint string `json:"lcd_endpoint"`
+}
