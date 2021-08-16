@@ -94,8 +94,41 @@ func (h *Hsc) GetBlockHeightInfo(height int64) (BlockMeta, error) {
 	return blockInfo.BlockMeta, nil
 }
 
+func (tx *TransferInfo) UserTransferInfo() (UserTransferInfo, error) {
+	userTransferInfo := UserTransferInfo{}
+	userTransferInfo.Count = tx.Count
+	userTransferInfo.Limit = tx.Limit
+	userTransferInfo.PageNumber = tx.PageNumber
+	userTransferInfo.PageTotal = tx.PageTotal
+	userTransferInfo.TotalCount = tx.TotalCount
+	userTransferInfo.Txs = make([]UserTxs, 0)
+	for _, val := range tx.Txs {
+		userTxs := UserTxs{}
+		userTxs.Txhash = val.Txhash
+		userTxs.Height = val.Height
+		if len(val.Logs) < 1 {
+			return userTransferInfo, fmt.Errorf("not find logs info")
+		}
+		userTxs.Success = val.Logs[0].Success
+		userTxs.Log = val.Logs[0].Log
+		if len(val.Tx.Value.Msg) < 1 {
+			return userTransferInfo, fmt.Errorf("not find tx info")
+		}
+		userTxs.FromAddress = val.Tx.Value.Msg[0].Value.FromAddress
+		userTxs.ToAddress = val.Tx.Value.Msg[0].Value.ToAddress
+		if len(val.Tx.Value.Msg[0].Value.Amount) < 1 {
+			return userTransferInfo, fmt.Errorf("not find amount info")
+		}
+		userTxs.Amount = val.Tx.Value.Msg[0].Value.Amount[0].Amount
+		userTxs.Denom = val.Tx.Value.Msg[0].Value.Amount[0].Denom
+		userTxs.Memo = val.Tx.Value.Memo
+		userTransferInfo.Txs = append(userTransferInfo.Txs, userTxs)
+	}
+	return userTransferInfo, nil
+}
+
 func (h *Hsc) GetBlockHeightTxInfo(height, limit, page int64) (TransferInfo, error) {
-	endpoint := fmt.Sprintf("%s/txs?tx.minheight=%d&tx.maxheight=%d&page=%d&limit=%d", h.LcdEndpoint, height, height, limit, page)
+	endpoint := fmt.Sprintf("%s/txs?tx.minheight=%d&tx.maxheight=%d&page=%d&limit=%d", h.LcdEndpoint, height, height, page, limit)
 	fmt.Println(endpoint)
 	resp, err := http.Get(endpoint)
 	if err != nil {
@@ -108,9 +141,60 @@ func (h *Hsc) GetBlockHeightTxInfo(height, limit, page int64) (TransferInfo, err
 	if err != nil {
 		return TransferInfo{}, err
 	}
-	fmt.Println(info)
 
 	return info, nil
+}
+
+func (h *Hsc) GetAddressTxInfo(role, address string, limit, page int64) (TransferInfo, error) {
+	endpoint := ""
+	switch role {
+	case "sender":
+		endpoint = fmt.Sprintf("%s/txs?message.action=send&message.%s=%s&page=%d&limit=%d", h.LcdEndpoint, role, address, page, limit)
+		break
+	case "recipient":
+		endpoint = fmt.Sprintf("%s/txs?message.action=send&transfer.%s=%s&page=%d&limit=%d", h.LcdEndpoint, role, address, page, limit)
+		break
+	default:
+		return TransferInfo{}, fmt.Errorf("not find tx message!")
+	}
+
+	fmt.Println(endpoint)
+	resp, err := http.Get(endpoint)
+	if err != nil {
+		return TransferInfo{}, err
+	}
+
+	var info TransferInfo
+	jdec := json.NewDecoder(resp.Body)
+	err = jdec.Decode(&info)
+	if err != nil {
+		return TransferInfo{}, err
+	}
+
+	return info, nil
+}
+
+func (tx *Txs) UserTxs() (UserTxs, error) {
+	userTxs := UserTxs{}
+	userTxs.Txhash = tx.Txhash
+	userTxs.Height = tx.Height
+	if len(tx.Logs) < 1 {
+		return userTxs, fmt.Errorf("not find logs info")
+	}
+	userTxs.Success = tx.Logs[0].Success
+	userTxs.Log = tx.Logs[0].Log
+	if len(tx.Tx.Value.Msg) < 1 {
+		return userTxs, fmt.Errorf("not find tx info")
+	}
+	userTxs.FromAddress = tx.Tx.Value.Msg[0].Value.FromAddress
+	userTxs.ToAddress = tx.Tx.Value.Msg[0].Value.ToAddress
+	if len(tx.Tx.Value.Msg[0].Value.Amount) < 1 {
+		return userTxs, fmt.Errorf("not find amount info")
+	}
+	userTxs.Amount = tx.Tx.Value.Msg[0].Value.Amount[0].Amount
+	userTxs.Denom = tx.Tx.Value.Msg[0].Value.Amount[0].Denom
+	userTxs.Memo = tx.Tx.Value.Memo
+	return userTxs, nil
 }
 
 func (h *Hsc) GetTxHashTxInfo(hash string) (Txs, error) {

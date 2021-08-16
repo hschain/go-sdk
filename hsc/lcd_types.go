@@ -6,6 +6,7 @@ import (
 	"github.com/hschain/hschain/types"
 )
 
+
 // TxBody represents the body of a Cosmos transaction
 // signed and ready to be sent over the LCD REST service.
 type TxBody struct {
@@ -25,12 +26,19 @@ type AccountDataResult struct {
 	Value AccountDataValue `json:"value"`
 }
 
+type PublicKey struct {
+	Type  string `json:"type"`
+	Value string `json:"value"`
+}
+
 // AccountDataValue represents the real data obtained by calling /auth/accounts/{address} LCD
 // REST endpoint.
 type AccountDataValue struct {
-	Address       string `json:"address"`
-	AccountNumber string `json:"account_number"`
-	Sequence      string `json:"sequence"`
+	Address       string    `json:"address"`
+	Coins         []Coin    `json:"coins"`
+	PublicKey     PublicKey `json:"public_key"`
+	AccountNumber string    `json:"account_number"`
+	Sequence      string    `json:"sequence"`
 }
 
 // NodeInfo is the LCD REST response to a /node_info request,
